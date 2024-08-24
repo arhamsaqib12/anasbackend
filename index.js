@@ -17,7 +17,12 @@ const port = 5000;
 
 // Serve static files
 app.use("/uploads", express.static("uploads"));
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://twit-backend-production.up.railway.app'],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use('/uploads/profile_pics', express.static('uploads/profile_pics'));
