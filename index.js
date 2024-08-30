@@ -11,21 +11,19 @@ import storyrouter from "./Routers/StoryRouter.js";
 import searchrouter from "./Routers/SerachRouter.js";
 import Like from "./Models/LikeModel.js";
 import likerouter from "./Routers/LikeRouter.js";
-
+import commentRouter from './Routers/CommentRouter.js'; // Adjust the path as necessary
+import savedPostsRouter from './Routers/SavedPostRouter.js'
+import authenticate from "./Middleware.js";
 const app = express();
 const port = 5000;
 
 // Serve static files
 app.use("/uploads", express.static("uploads"));
-app.use(cors({
-  origin: ['http://localhost:3000', 'https://twit-backend-production.up.railway.app'],
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-}));
+app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use('/uploads/profile_pics', express.static('uploads/profile_pics'));
+
 
 // Define routes
 app.use("/", searchrouter);
@@ -33,6 +31,8 @@ app.use("/user", authrouter); // Authentication routes
 app.use("/", postrouter); // Post routes with a specific prefix
 app.use("/story", storyrouter);
 app.use("/like", likerouter);
+app.use('/comments', commentRouter);
+app.use('/saved-posts', authenticate, savedPostsRouter);
 
 // Set up Socket.IO
 const server = http.createServer(app);
@@ -70,9 +70,8 @@ sequelize.authenticate()
   .catch((err) => {
     console.error("Unable to connect to the database:", err);
   });
-
 // Synchronize Sequelize models with the database
-sequelize.sync().then(() => {
+sequelize.sync({ force: true }).then(() => {
   console.log("Database & tables created with Sequelize!");
 }).catch(console.error);
 
